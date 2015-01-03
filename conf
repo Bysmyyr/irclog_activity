@@ -1,0 +1,34 @@
+[main]
+output_path  = /some/dir/here/ ;where output files if not in widget mode
+colormap = jet 	;http://wiki.scipy.org/Cookbook/Matplotlib/Show_colormaps
+xkcd = 0 	; 1 or 0 xkcd mode: http://nbviewer.ipython.org/url/jakevdp.github.com/downloads/notebooks/XKCD_plots.ipynb remember to install humour-sans to use XKCD
+widget = 0	; 0 = png, 1 = python widgets, enabling this needs also uncommenting one line at the begingin of the file 
+verbose = 0	;will print something anyways
+log_folder = /some/dir/here ;this is the base folder of the log files
+
+
+[log_paths] 	; anything = path  eg: key not matter anything(have to differ)
+path1   = ./#channel1.log
+path2   = ./!channel2.log
+#path6   = ./#channel_not_in_use.log
+
+[output_configs] ; some exambles. number means how many days are used
+out0 = norm ; normal
+out1 = cumsum ;cumulative sum
+out2 = rolling 20 ; rolling mean
+out3 = rolling 30
+out4 = rolling 60
+out5 = rolling 200
+out6 = exp 30
+
+[users] ; nick = id; every id only one time
+nick1 = 0
+nick2 = 1
+
+
+[aliases] ; every nick only one time, also not same nicks than users section
+alter1_1 = 0
+alter1_2 = 0
+alter2_1 = 1
+
+
