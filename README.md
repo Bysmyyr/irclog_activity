@@ -5,6 +5,8 @@ Basic script for creating activity charts from default weechat logfile.(there is
 
 Just fill the config file and run.
 
+Look for example pictures from repo
+
 running: ./parseri.py noX/X [config_file]
 
 but either noX if you do not have X(then widgets do not work)
