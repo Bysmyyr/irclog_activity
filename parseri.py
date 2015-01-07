@@ -3,8 +3,8 @@
 
 # remember to install humour-sans to use XKCD
 
-#GPL 2
-#copyright Olli Syrjälä
+# GPL 2
+# copyright Olli Syrjala (Bysmyyr)
 
 import sys
 import re
@@ -52,11 +52,11 @@ def printing(data, days, users, output_path, colormap, xkcd, widget, outputs):
 def parsefile(data, file_object, aliases, user_count, verbose):
     date = None
     for line in file_object:
-        if line[0] == '-':
+        if line[0] == '-': #this means new day in logfile. This should be reworked to use regexps TODO
             dateline = line[19:]
             date = parser.parse(dateline)
             date = date.isoformat() #strip time
-        elif line[6] == '<':
+        elif line[6] == '<':  #this means messageline but not good way to do it, regexps TODO
             name_match = USERNAME.match(line)
             if not name_match:
                 if verbose:
@@ -70,30 +70,20 @@ def parsefile(data, file_object, aliases, user_count, verbose):
             else:
                 if date not in data:
                     data[date] = [0] * user_count
-                data[date][who] += 1
+                data[date][who] += 1 #how about collections.Counter ?
 
 
-def process(filename):
+def process(config_path):
     Config = ConfigParser.ConfigParser()
-    Config.read(filename)
+    Config.read(config_path)
     output_path = Config.get("main", "output_path")
     colormap = Config.get("main", "colormap")
     log_folder = Config.get("main", "log_folder")
 
-    if Config.get("main", "widget") == '1':
-        widget = True
-    else:
-        widget = False
+    widget =  Config.getboolean("main", "widget")
+    verbose = Config.getboolean("main", "verbose")
+    xkcd = Config.getboolean("main", "xkcd")
 
-    if Config.get("main", "verbose") == '1':
-        verbose = True
-    else:
-        verbose = False
-
-    if Config.get("main", "xkcd") == '1':
-        xkcd = True
-    else:
-        xkcd = False
 
     log_files = []
     log_path_items = Config.items("log_paths")
@@ -129,9 +119,7 @@ def process(filename):
     points = []
     data = data.items()
     data.sort()
-    for d in data:
-        p = d[1]
-        t = d[0]
+    for t, p in data:
         t = parser.parse(t)
         dates.append(t)
         points.append(p)
@@ -139,15 +127,10 @@ def process(filename):
 
 
 def main():
-    config_paths = []
 
-    if len(sys.argv) != 0:
-        i = 1
-        while i < len(sys.argv):
-            config_paths.append(sys.argv[i])
-            i += 1
-    else:
-        config_paths.append("./conf")
+    config_paths = sys.argv[1:]
+    if not config_paths:
+        config_paths = ['./conf']
 
     for path in config_paths:
         process(path)
