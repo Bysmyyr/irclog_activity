@@ -7,7 +7,7 @@ verbose = 0	;will print something anyways
 log_folder = /some/dir/here ;this is the base folder of the log files
 
 
-[log_paths] 	; anything = path  eg: key not matter anything(have to differ)
+[log_paths] 	; anything = path  eg: key not matter(have to differ)
 path1   = ./#channel1.log
 path2   = ./!channel2.log
 #path6   = ./#channel_not_in_use.log

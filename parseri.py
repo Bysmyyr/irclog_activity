@@ -11,14 +11,14 @@ import re
 from dateutil import parser
 import pandas
 import ConfigParser
-import matplotlib
-matplotlib.use('Agg') # use this when no Xorg. no widgets, but exported images work, commend out if you want widgets
-import matplotlib.pyplot as plt
-
-USERNAME = re.compile('[0-9 :]+<[@+ ]?([^>]+)>.*')
 
 
-def printing(data, days, users, output_path, colormap, xkcd, widget, outputs):
+#IRSSI = re.compile('[0-9 :]+<[@+ ]?([^>]+)>.*')  #this not work
+WEECHAT = re.compile(r'^(?P<day>\d{4}-\d{2}-\d{2}) (?P<time>\d{2}:\d{2}:\d{2})\s+[+@%]?(?P<nick>\S+)')
+
+
+def printing(data, days, users, output_path, colormap, xkcd, widget, outputs, plt):
+
     if xkcd:
         plt.xkcd(1, 100, 2)
     df = pandas.DataFrame(data, columns=users, index=days)
@@ -52,28 +52,26 @@ def printing(data, days, users, output_path, colormap, xkcd, widget, outputs):
 def parsefile(data, file_object, aliases, user_count, verbose):
     date = None
     for line in file_object:
-        if line[0] == '-': #this means new day in logfile. This should be reworked to use regexps TODO
-            dateline = line[19:]
-            date = parser.parse(dateline)
-            date = date.isoformat() #strip time
-        elif line[6] == '<':  #this means messageline but not good way to do it, regexps TODO
-            name_match = USERNAME.match(line)
-            if not name_match:
-                if verbose:
-                    print line
-                continue
-            name = name_match.group(1).lower()
-            who = aliases.get(name)
-            if not who:
-                if verbose:
-                    print name
-            else:
-                if date not in data:
-                    data[date] = [0] * user_count
-                data[date][who] += 1 #how about collections.Counter ?
+        match = WEECHAT.match(line)
+        if not match:
+            if verbose:
+                print line
+            continue
+        date_str = match.group('day')
+        date = parser.parse(date_str)
+        name = match.group('nick')
+        name = name.lower()
+        who = aliases.get(name)
+        if not who:
+            if verbose:
+                print name
+        else:
+            if date not in data:
+                data[date] = [0] * user_count
+            data[date][who] += 1 #how about collections.Counter ?
 
 
-def process(config_path):
+def process(config_path, plt):
     Config = ConfigParser.ConfigParser()
     Config.read(config_path)
     output_path = Config.get("main", "output_path")
@@ -120,20 +118,24 @@ def process(config_path):
     data = data.items()
     data.sort()
     for t, p in data:
-        t = parser.parse(t)
         dates.append(t)
         points.append(p)
-    printing(points, dates, users, output_path, colormap, xkcd, widget, output_configs)
+    printing(points, dates, users, output_path, colormap, xkcd, widget, output_configs, plt)
 
 
 def main():
 
-    config_paths = sys.argv[1:]
+    config_paths = sys.argv[2:]
     if not config_paths:
         config_paths = ['./conf']
 
+    import matplotlib
+    if sys.argv[1] is "noX":
+        matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+
     for path in config_paths:
-        process(path)
+        process(path, plt)
 
 
 if __name__ == "__main__":
