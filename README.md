@@ -9,6 +9,6 @@ Look for example pictures from repo
 
 running: ./parseri.py noX/X [config_file]
 
-but either noX if you do not have X(then widgets do not work)
+put noX if you do not have X(then widgets do not work)
 
 It uses Python 2.7 and needs matplotlib and pandas.
